@@ -19,13 +19,21 @@ export default function Navbar() {
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
-    window.addEventListener("scroll", onScroll);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   useEffect(() => {
     setMobileOpen(false);
-  }, [location]);
+  }, [location.pathname]);
+
+  useEffect(() => {
+    document.body.style.overflow = mobileOpen ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [mobileOpen]);
 
   return (
     <>
@@ -36,23 +44,23 @@ export default function Navbar() {
             : "bg-transparent"
         }`}
       >
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16 lg:h-20">
-            {/* Logo */}
-            <Link to="/" className="flex items-center gap-2">
-              <span className="text-primary font-bold text-lg tracking-wider">D&L</span>
-              <span className="text-foreground/60 text-xs tracking-widest uppercase hidden sm:block">
-                TRAVEL ADVENTURES
+        <div className="site-shell">
+          <div className="flex items-center justify-between h-[var(--site-header-height)]">
+            <Link to="/" className="flex items-center gap-3 shrink-0">
+              <span className="text-primary font-bold text-lg lg:text-xl tracking-[0.18em]">
+                D&amp;L
+              </span>
+              <span className="text-foreground/60 text-[10px] lg:text-[11px] tracking-[0.26em] uppercase hidden sm:block">
+                Travel Adventures
               </span>
             </Link>
 
-            {/* Desktop Nav */}
-            <div className="hidden lg:flex items-center gap-8">
+            <div className="hidden lg:flex items-center gap-8 xl:gap-10">
               {NAV_LINKS.map((link) => (
                 <Link
                   key={link.path}
                   to={link.path}
-                  className={`text-[11px] tracking-[0.2em] font-medium transition-colors duration-300 ${
+                  className={`text-[11px] xl:text-[12px] tracking-[0.2em] font-medium transition-colors duration-300 ${
                     location.pathname === link.path
                       ? "text-primary"
                       : "text-foreground/50 hover:text-foreground"
@@ -63,9 +71,11 @@ export default function Navbar() {
               ))}
             </div>
 
-            {/* CTA */}
             <div className="hidden lg:flex items-center gap-4">
-              <a href="tel:+1-555-0123" className="flex items-center gap-2 text-foreground/50 hover:text-primary transition-colors text-xs tracking-wider">
+              <a
+                href="tel:+1-555-0123"
+                className="flex items-center gap-2 text-foreground/50 hover:text-primary transition-colors text-[11px] xl:text-xs tracking-[0.18em]"
+              >
                 <Phone className="w-3.5 h-3.5" />
                 CALL NOW
               </a>
@@ -76,10 +86,10 @@ export default function Navbar() {
               </Link>
             </div>
 
-            {/* Mobile Toggle */}
             <button
               className="lg:hidden text-foreground/70 hover:text-foreground transition-colors"
-              onClick={() => setMobileOpen(!mobileOpen)}
+              onClick={() => setMobileOpen((prev) => !prev)}
+              aria-label="Toggle menu"
             >
               {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
@@ -87,43 +97,57 @@ export default function Navbar() {
         </div>
       </nav>
 
-      {/* Mobile Menu */}
       <AnimatePresence>
         {mobileOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-40 bg-background pt-20 px-6"
-          >
-            <div className="flex flex-col gap-6 mt-8">
-              {NAV_LINKS.map((link) => (
-                <Link
-                  key={link.path}
-                  to={link.path}
-                  className={`text-sm tracking-[0.2em] font-medium border-b border-border pb-4 ${
-                    location.pathname === link.path
-                      ? "text-primary"
-                      : "text-foreground/60"
-                  }`}
-                >
-                  {link.label}
-                </Link>
-              ))}
-              <div className="flex flex-col gap-3 mt-4">
-                <a href="tel:+1-555-0123" className="flex items-center gap-2 text-foreground/60 text-sm tracking-wider">
-                  <Phone className="w-4 h-4" />
-                  CALL NOW
-                </a>
-                <Link to="/contact">
-                  <Button className="w-full bg-primary text-primary-foreground text-xs tracking-[0.15em] font-semibold h-12">
-                    GET A QUOTE
-                  </Button>
-                </Link>
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-40 bg-background/80 backdrop-blur-sm"
+              onClick={() => setMobileOpen(false)}
+            />
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.25 }}
+              className="fixed inset-x-0 top-[var(--site-header-height)] z-50 border-b border-border bg-background px-6 py-6"
+            >
+              <div className="site-shell">
+                <div className="flex flex-col gap-6">
+                  {NAV_LINKS.map((link) => (
+                    <Link
+                      key={link.path}
+                      to={link.path}
+                      className={`text-sm tracking-[0.2em] font-medium border-b border-border pb-4 ${
+                        location.pathname === link.path
+                          ? "text-primary"
+                          : "text-foreground/60"
+                      }`}
+                    >
+                      {link.label}
+                    </Link>
+                  ))}
+
+                  <div className="flex flex-col gap-3 mt-2">
+                    <a
+                      href="tel:+1-555-0123"
+                      className="flex items-center gap-2 text-foreground/60 text-sm tracking-wider"
+                    >
+                      <Phone className="w-4 h-4" />
+                      CALL NOW
+                    </a>
+                    <Link to="/contact">
+                      <Button className="w-full bg-primary text-primary-foreground text-xs tracking-[0.15em] font-semibold h-12">
+                        GET A QUOTE
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
               </div>
-            </div>
-          </motion.div>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
     </>

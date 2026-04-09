@@ -40,6 +40,13 @@
     --sidebar-accent-foreground: 36 33% 93%;
     --sidebar-border: 0 0% 14%;
     --sidebar-ring: 37 66% 48%;
+
+    /* Shared site contract */
+    --site-max: 1440px;
+    --site-header-height: 64px;
+    --hero-min: 720px;
+    --hero-ideal: 92vh;
+    --hero-max: 980px;
   }
 
   .dark {
@@ -76,15 +83,86 @@
     --sidebar-border: 0 0% 14%;
     --sidebar-ring: 37 66% 48%;
   }
-}
 
-@layer base {
+  @media (min-width: 1024px) {
+    :root {
+      --site-header-height: 80px;
+    }
+  }
+
   * {
     @apply border-border outline-ring/50;
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    overflow-x: hidden;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
   }
 
   body {
     @apply bg-background text-foreground font-inter;
+    margin: 0;
+    min-width: 320px;
+    overflow-x: hidden;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  #root {
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  img,
+  picture,
+  video,
+  canvas,
+  svg {
+    display: block;
+    max-width: 100%;
+  }
+}
+
+@layer components {
+  .site-shell {
+    width: min(100% - 2rem, var(--site-max));
+    margin-inline: auto;
+  }
+
+  @media (min-width: 768px) {
+    .site-shell {
+      width: min(100% - 3rem, var(--site-max));
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .site-shell {
+      width: min(100% - 4rem, var(--site-max));
+    }
+  }
+
+  .page-offset {
+    padding-top: var(--site-header-height);
+  }
+
+  .hero-shell {
+    min-height: clamp(var(--hero-min), var(--hero-ideal), var(--hero-max));
+  }
+
+  .section-space {
+    @apply py-24 lg:py-32;
+  }
+
+  .section-title {
+    @apply text-4xl lg:text-5xl font-bold text-foreground;
+  }
+
+  .section-copy {
+    @apply text-base lg:text-lg leading-relaxed text-muted-foreground;
   }
 }
 
@@ -93,11 +171,8 @@
   filter: grayscale(100%);
   transition: filter 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
-.img-grayscale:hover, .group:hover .img-grayscale {
-  filter: grayscale(0%);
-}
 
-/* Smooth scrolling */
-html {
-  scroll-behavior: smooth;
+.img-grayscale:hover,
+.group:hover .img-grayscale {
+  filter: grayscale(0%);
 }
